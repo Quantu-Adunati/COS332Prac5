@@ -29,7 +29,7 @@ function getName()
     {
         readline.question(`Name to search?`, (name) => {
         console.log(`Name entered ${name}!`)       
-        readline.close()
+        //readline.close()
         resolve(name)
         });
     });
@@ -45,30 +45,28 @@ function doLDAP(name)
         filter:`(objectClass=*)`
     }
     client.search(`cn=${name},cn=Friends,cn=admin,dc=cos332,dc=com`,searchOptions, function(err, res) {
-       console.log(err);
+      if(err !=null){console.log(err);}
       
         res.on('searchEntry', function(entry) {
-          console.log('entry: ' + JSON.stringify(entry.object.mobile));
+          if(entry != null)
+          
           return new Promise((resolve)=>
           {
+          
+            console.log('Number: ' + JSON.stringify(entry.object.mobile));
             resolve();
           });
-        });
-        res.on('searchReference', function(referral) {
-          console.log('referral: ' + referral.uris.join());
-        });
-        res.on('error', function(err) {
-          console.error('error: ' + err.message);
-        });
-        res.on('end', function(result) {
-          console.log('status: ' + result.status);
         });
       });
       
 }
 function callTheLoop()
 {
-    askQuestion().then(getName).then(doLDAP).then(callTheLoop);
+    askQuestion().then(getName).then(doLDAP).then(secondTheLoop);
+}
+function secondTheLoop()
+{
+  getName().then(doLDAP).then(secondTheLoop);
 }
 callTheLoop();
 
